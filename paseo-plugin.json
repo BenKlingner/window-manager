@@ -1,0 +1,9 @@
+{
+  "id": "window-manager",
+  "name": "Window Manager",
+  "description": "Save project groups as windows and combine shared groups into sessions.",
+  "media": [],
+  "requirements": {
+    "paseo": ">=0.13.2 <0.14.0"
+  }
+}

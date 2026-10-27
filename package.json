@@ -1,0 +1,52 @@
+{
+  "name": "window-manager",
+  "version": "0.1.0",
+  "files": [
+    "paseo-plugin.json",
+    "OVERVIEW.md",
+    "OVERVIEW.*.md",
+    "index.client.ts",
+    "index.client.tsx",
+    "index.server.ts",
+    "index.server.tsx",
+    "client/",
+    "server/",
+    "shared/",
+    "LICENSE",
+    "README.md",
+    "SECURITY.md"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test client/__tests__/*.test.mts",
+    "test:ui": "node --import tsx client/__tests__/ui.mts"
+  },
+  "devDependencies": {
+    "@getpaseo/client": "0.13.2",
+    "@getpaseo/plugin": "0.13.2",
+    "@getpaseo/protocol": "0.13.2",
+    "@tanstack/react-query": "^5.90.11",
+    "@types/react": "~19.2.0",
+    "esbuild": "^0.28.1",
+    "playwright": "^1.56.1",
+    "react": "19.1.0",
+    "react-dom": "^19.1.0",
+    "react-native": "0.81.5",
+    "react-native-web": "^0.21.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "zod": "^4.4.3"
+  },
+  "type": "module",
+  "description": "Save project groups as windows and combine shared groups into sessions.",
+  "author": "Ben Klingner",
+  "license": "MIT",
+  "homepage": "https://github.com/BenKlingner/window-manager",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BenKlingner/window-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BenKlingner/window-manager/issues"
+  }
+}
