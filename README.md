@@ -32,6 +32,22 @@ workspace's top-right header opens the current project, a saved group, or a sess
 See [the overview](OVERVIEW.md) for behavior and limitations, and
 [the security notes](SECURITY.md) for what the plugin reads and writes.
 
+## Screenshots
+
+The plugin UI below uses fictional demo projects and sessions.
+
+### Project groups
+
+Choose which projects share a window, and see the sessions that use each group.
+
+![Project groups showing Product development and Design & docs, both used by the Daily workspace session](assets/project-groups.png)
+
+### Sessions manager
+
+Combine saved groups into a session and open one window per group.
+
+![Sessions manager showing the Daily workspace session with two project groups and an Open all windows button](assets/sessions.png)
+
 ## Platform support
 
 Opening windows works only in Paseo Desktop. The plugin asks the desktop app to create each
