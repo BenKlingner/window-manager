@@ -5,6 +5,7 @@
     "paseo-plugin.json",
     "OVERVIEW.md",
     "OVERVIEW.*.md",
+    "assets/",
     "index.client.ts",
     "index.client.tsx",
     "index.server.ts",
@@ -19,7 +20,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test client/__tests__/*.test.mts",
-    "test:ui": "node --import tsx client/__tests__/ui.mts"
+    "test:ui": "node --import tsx client/__tests__/ui.mts",
+    "screenshots": "node --import tsx client/__tests__/screenshots.mts"
   },
   "devDependencies": {
     "@getpaseo/client": "0.13.2",

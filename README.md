@@ -1,5 +1,7 @@
 # Window Manager for Paseo
 
+![Window Manager for Paseo — three overlapping window outlines on a muted dark gradient](assets/hero.png)
+
 Open your Paseo projects in separate desktop windows. Save the projects for each window as a
 project group, combine groups into named sessions, and open a whole session with one click.
 
