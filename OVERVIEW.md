@@ -2,7 +2,7 @@
 
 Window Manager opens projects in separate Paseo Desktop windows. Save the projects for each window as a Project Group, then combine groups into named sessions.
 
-Use the Window Manager button in a workspace’s top-right header to open that project in its own window, open a saved project group, or launch all groups in a session. On narrow layouts, find the button in the workspace menu.
+Use the Window Manager button in a workspace’s top-right header to open that project in its own window, pick any other project from a searchable list and open it in a new window, open a saved project group, or launch all groups in a session. On narrow layouts, find the button in the workspace menu.
 
 Choose **Set up project groups and sessions** to open three tabs:
 

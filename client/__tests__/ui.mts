@@ -133,8 +133,20 @@ try {
   assert.equal(await button('Secondary').isDisabled(),true);
   await tab('Sessions manager');
   assert.equal(await button('Open all windows').isDisabled(),true);
+  // The menu's project picker opens any project, finding its workspace rather than reusing this one.
+  await button('Open another project in a new window…').click();
+  await page.getByText('Current',{exact:true}).waitFor();
+  await page.getByRole('textbox',{name:'Search projects',exact:true}).fill('web');
+  assert.equal(await button('Open Plugins').count(),0);
+  await page.screenshot({path:'test-output/project-picker-'+mode+'.png',fullPage:true});
+  await button('Open Website').click();
+  await page.waitForFunction(()=> (window as any).launched?.length===1 && (window as any).launched[0].workspaceId==='workspace-website');
+  assert.deepEqual(await page.evaluate(()=> (window as any).launched[0].projectKeys),['website']);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'No horizontal overflow in picker: '+mode);
+  await button('Back').click();
+  await button('Open another project in a new window…').waitFor();
   assert.deepEqual(errors,[]);
-  console.log('PASS '+mode+': shared groups, new/existing membership, editing from both tabs, launch resolution, conflicts, deletion, layout');
+  console.log('PASS '+mode+': shared groups, new/existing membership, editing from both tabs, launch resolution, conflicts, deletion, project picker, layout');
   await page.close();
  }
 } finally {await browser.close();server.close();}

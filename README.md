@@ -18,11 +18,12 @@ paseo plugin add git:BenKlingner/window-manager
 Plugins run as trusted code on your Paseo host and inside the app. Review the source before installing.
 Open **Settings → Plugins → window-manager → Window Manager** to set up project groups and sessions,
 or use **Window Manager: settings** in the Command Center. The **Window Manager** button in a
-workspace's top-right header opens the current project, a saved group, or a session.
+workspace's top-right header opens the current project, any other project, a saved group, or a session.
 
 ## Features
 
 - Open the current project in its own window.
+- Pick any project on the host from a searchable list and open it in a new window.
 - Save project groups. Each group opens one window showing only its selected projects.
 - Combine shared groups into sessions and open every window in a session at once.
 - Edit a group once and every session that uses it is updated.

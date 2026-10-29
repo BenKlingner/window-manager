@@ -1,10 +1,11 @@
-import { useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useWorkspace, usePaseo, type PluginButtonContentProps } from "@getpaseo/plugin/client";
 import { sessionWindows } from "../shared/settings";
 import { useLibrary } from "./library";
 import { prepareWindows } from "./projects";
 import { desktopUnavailableReason, type Launcher } from "./web";
+import { ProjectPicker } from "./project-picker";
 import { Action, Copy, Divider } from "./ui";
 
 export function WindowMenu({ theme, host, workspaceId, launcher, openSetup }: PluginButtonContentProps & { launcher: Launcher; openSetup(): void }) {
@@ -14,10 +15,23 @@ export function WindowMenu({ theme, host, workspaceId, launcher, openSetup }: Pl
   const project = useWorkspace(workspaceId, (w) => ({ id: w.projectId, name: w.projectDisplayName }));
   const launch = useSyncExternalStore(launcher.subscribe, launcher.getSnapshot);
   const unavailable = desktopUnavailableReason();
+  const [picking, setPicking] = useState(false);
+  const status = <>
+    {unavailable && <Copy theme={theme} muted>{unavailable}</Copy>}
+    {launch.message && <Copy theme={theme}>{launch.message}</Copy>}
+    {launch.error && <Copy theme={theme} error>{launch.error}</Copy>}
+  </>;
+  if (picking) return <View style={{ gap: 10, minWidth: 260, maxWidth: 420 }}>
+    <ProjectPicker theme={theme} paseo={paseo} hostId={host.id} currentProjectId={project?.id} disabled={!!unavailable || launch.busy}
+      onBack={() => setPicking(false)}
+      onOpen={(picked) => { void launcher.run(() => prepareWindows(paseo, host.id, [{ id: "picked", name: picked.name.slice(0, 80), projectIds: [picked.id] }])); }} />
+    {status}
+  </View>;
   return <View style={{ gap: 10, minWidth: 260, maxWidth: 420 }}>
     <Action theme={theme} label="Open this project in its own window" disabled={!!unavailable || !project || launch.busy}
       onPress={() => { if (project) void launcher.run(() => prepareWindows(paseo, host.id, [{ id: "current", name: project.name.slice(0, 80), projectIds: [project.id] }], workspaceId)); }} />
     {project && <Copy theme={theme} muted>{project.name}</Copy>}
+    <Action theme={theme} label="Open another project in a new window…" onPress={() => setPicking(true)} />
     <Divider theme={theme} />
     <ScrollView style={{ maxHeight: 360 }} contentContainerStyle={{ gap: 10 }}>
     <Text style={{ color: theme.colors.foregroundMuted, fontSize: 11, fontWeight: "700", letterSpacing: 0.7 }}>SAVED SESSIONS</Text>
@@ -36,9 +50,7 @@ export function WindowMenu({ theme, host, workspaceId, launcher, openSetup }: Pl
           onPress={() => { void launcher.run(() => prepareWindows(paseo, host.id, [window])); }} />
       ) : <Copy theme={theme} muted>No project groups yet. Create one in setup.</Copy>)}
     </ScrollView>
-    {unavailable && <Copy theme={theme} muted>{unavailable}</Copy>}
-    {launch.message && <Copy theme={theme}>{launch.message}</Copy>}
-    {launch.error && <Copy theme={theme} error>{launch.error}</Copy>}
+    {status}
     <Divider theme={theme} />
     <Action theme={theme} label="Set up project groups and sessions" onPress={openSetup} />
   </View>;
