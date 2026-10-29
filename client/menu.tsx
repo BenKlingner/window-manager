@@ -30,7 +30,6 @@ export function WindowMenu({ theme, host, workspaceId, launcher, openSetup }: Pl
   return <View style={{ gap: 10, minWidth: 260, maxWidth: 420 }}>
     <Action theme={theme} label="Open this project in its own window" disabled={!!unavailable || !project || launch.busy}
       onPress={() => { if (project) void launcher.run(() => prepareWindows(paseo, host.id, [{ id: "current", name: project.name.slice(0, 80), projectIds: [project.id] }], workspaceId)); }} />
-    {project && <Copy theme={theme} muted>{project.name}</Copy>}
     <Action theme={theme} label="Open another project in a new window…" onPress={() => setPicking(true)} />
     <Divider theme={theme} />
     <ScrollView style={{ maxHeight: 360 }} contentContainerStyle={{ gap: 10 }}>
