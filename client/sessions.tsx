@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePaseo, type PluginSurfaceProps } from "@getpaseo/plugin/client";
 import { preferencesSchema, sessionWindows, type Preferences, type SavedSession, type SavedWindow } from "../shared/settings";
-import { desktopUnavailableReason, newId, type Launcher } from "./web";
+import { desktopCompatibilityNotice, desktopUnavailableReason, newId, type Launcher } from "./web";
 import { loadProjects, prepareWindows } from "./projects";
 import { Action, Card, Copy, Divider } from "./ui";
 import { Field, WindowEditor } from "./window-editor";
@@ -27,6 +27,7 @@ export function SessionSettings({ theme, host, layout, launcher, sessionRequest 
   const [pendingSession, setPendingSession] = useState<string | null>(null);
   const launch = useSyncExternalStore(launcher.subscribe, launcher.getSnapshot);
   const unavailable = desktopUnavailableReason();
+  const untested = desktopCompatibilityNotice();
   const busy = settings.saving || launch.busy;
   useEffect(() => { setDraft(null); setError(null); setDeleting(null); setPicking(false); setPendingSession(null); }, [host.id]);
   function edit(session: SavedSession) {
@@ -50,10 +51,10 @@ export function SessionSettings({ theme, host, layout, launcher, sessionRequest 
     const exists = draft.base.sessions.some((s) => s.id === draft.session.id);
     const sessions = exists ? draft.base.sessions.map((s) => s.id === draft.session.id ? draft.session : s) : [...draft.base.sessions, draft.session];
     const result = preferencesSchema.safeParse({ ...draft.base, projectGroups: draft.groups, sessions });
-    if (!result.success) { setError(result.error.issues[0]?.message ?? "Check the session details."); return; }
+    if (!result.success) { setError(result.error.issues[0]?.message ?? "Check the window group details."); return; }
     if (!draft.session.projectGroupIds.length) { setError("Add at least one project group."); return; }
     if (draft.base.sessions.some((s) => s.id !== draft.session.id && s.name.toLocaleLowerCase() === draft.session.name.trim().toLocaleLowerCase())) {
-      setError("A session already uses this name. Choose a different name."); return;
+      setError("A window group already uses this name. Choose a different name."); return;
     }
     for (const group of result.data.projectGroups) {
       if (draft.base.projectGroups.find((g) => g.id === group.id)?.name === group.name) continue;
@@ -70,31 +71,32 @@ export function SessionSettings({ theme, host, layout, launcher, sessionRequest 
   const draftGroups = draft ? draft.session.projectGroupIds.map((id) => draft.groups.find((g) => g.id === id)!) : [];
   return <View style={{ gap: 20, paddingVertical: 8 }}>
     <View style={{ gap: 8 }}>
-      <Text style={{ color: theme.colors.foreground, fontSize: layout.compact ? 22 : 26, fontWeight: "700" }}>Sessions manager</Text>
-      <Copy theme={theme} muted>Combine project groups into a session. Each group opens its own window. Editing a group here updates it everywhere it is used.</Copy>
+      <Text style={{ color: theme.colors.foreground, fontSize: layout.compact ? 22 : 26, fontWeight: "700" }}>Window groups</Text>
+      <Copy theme={theme} muted>Combine project groups into a window group. Each project group opens its own window. Editing a project group here updates it everywhere it is used.</Copy>
     </View>
     {unavailable && <Card theme={theme}><Copy theme={theme} muted>{unavailable}</Copy></Card>}
+    {untested && <Card theme={theme}><Copy theme={theme} muted>{untested}</Copy></Card>}
     {launch.message && <Copy theme={theme}>{launch.message}</Copy>}
     {launch.error && <Copy theme={theme} error>{launch.error}</Copy>}
-    {settings.status === "loading" && <Copy theme={theme} muted>Loading saved sessions…</Copy>}
+    {settings.status === "loading" && <Copy theme={theme} muted>Loading saved window groups…</Copy>}
     {(settings.status === "error" || settings.status === "invalid") && <Card theme={theme}>
       <Copy theme={theme} error>{settings.error}</Copy>
-      <Action theme={theme} label="Retry loading sessions" onPress={() => { void settings.reload(); }} />
+      <Action theme={theme} label="Retry loading window groups" onPress={() => { void settings.reload(); }} />
     </Card>}
     {settings.status === "ready" && !draft && <>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-        <Copy theme={theme} muted>{settings.values.sessions.length} saved session{settings.values.sessions.length === 1 ? "" : "s"} · {host.label}</Copy>
-        <Action theme={theme} primary label="New session" disabled={busy || settings.values.sessions.length >= 30}
+        <Copy theme={theme} muted>{settings.values.sessions.length} window group{settings.values.sessions.length === 1 ? "" : "s"} · {host.label}</Copy>
+        <Action theme={theme} primary label="New window group" disabled={busy || settings.values.sessions.length >= 30}
           onPress={() => edit({ id: newId(), name: "", projectGroupIds: [] })} />
       </View>
       {!settings.values.sessions.length && <Card theme={theme}>
         <Text style={{ color: theme.colors.foreground, fontSize: 17, fontWeight: "600" }}>Your workspace, one click away</Text>
-        <Copy theme={theme} muted>Create a session such as “Main”, then add the project groups you want to open together.</Copy>
+        <Copy theme={theme} muted>Create a window group such as “Main”, then add the project groups you want to open together.</Copy>
       </Card>}
       {settings.values.sessions.map((session) => <Card key={session.id} theme={theme}>
         <Text style={{ color: theme.colors.foreground, fontSize: 18, fontWeight: "600" }}>{session.name}</Text>
-        <Copy theme={theme} muted>{session.projectGroupIds.length} project group{session.projectGroupIds.length === 1 ? "" : "s"} · one window per group</Copy>
-        {!session.projectGroupIds.length && <Copy theme={theme} muted>Add a project group to launch this session.</Copy>}
+        <Copy theme={theme} muted>{session.projectGroupIds.length} project group{session.projectGroupIds.length === 1 ? "" : "s"} · one window per project group</Copy>
+        {!session.projectGroupIds.length && <Copy theme={theme} muted>Add a project group to launch this window group.</Copy>}
         {sessionWindows(settings.values, session).map((group) => <View key={group.id} style={{ gap: 3 }}>
           <Text style={{ color: theme.colors.foreground, fontSize: 14, fontWeight: "500" }}>{group.name}</Text>
           <Copy theme={theme} muted>{group.projectIds.map((id) => projects.data?.find((p) => p.id === id)?.name ?? (projects.isPending ? "Loading…" : "Unavailable project")).join(" · ")}</Copy>
@@ -103,30 +105,30 @@ export function SessionSettings({ theme, host, layout, launcher, sessionRequest 
         {deleting === session.id ? <View style={{ gap: 10 }}>
           <Copy theme={theme}>Delete “{session.name}”? Its project groups and open windows will be kept.</Copy>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-            <Action theme={theme} danger label="Delete session" disabled={busy} onPress={() => {
+            <Action theme={theme} danger label="Delete window group" disabled={busy} onPress={() => {
               void settings.save({ ...settings.values, sessions: settings.values.sessions.filter((s) => s.id !== session.id) }, settings.revision).then((ok) => { if (ok) setDeleting(null); });
             }} />
-            <Action theme={theme} label="Keep session" onPress={() => setDeleting(null)} disabled={busy} />
+            <Action theme={theme} label="Keep window group" onPress={() => setDeleting(null)} disabled={busy} />
           </View>
         </View> : <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           <Action theme={theme} primary label="Open all windows" disabled={busy || !!unavailable || !session.projectGroupIds.length}
             onPress={() => open(sessionWindows(settings.values, session))} />
-          <Action theme={theme} label="Edit session" disabled={busy} onPress={() => edit(session)} />
+          <Action theme={theme} label="Edit window group" disabled={busy} onPress={() => edit(session)} />
           <Action theme={theme} danger label="Delete" disabled={busy} onPress={() => setDeleting(session.id)} />
         </View>}
       </Card>)}
     </>}
     {draft && <View style={{ gap: 16 }}>
       {pendingSession && settings.status === "ready" && <Card theme={theme}>
-        <Copy theme={theme}>You have an open session draft. Keep editing it or discard it to open the other session.</Copy>
-        <Action theme={theme} label="Discard draft and switch session" disabled={busy} onPress={() => {
+        <Copy theme={theme}>You have an open window group draft. Keep editing it or discard it to open the other window group.</Copy>
+        <Action theme={theme} label="Discard draft and switch window group" disabled={busy} onPress={() => {
           const session = settings.values.sessions.find((s) => s.id === pendingSession); if (session) edit(session);
         }} />
         <Action theme={theme} label="Keep editing" onPress={() => setPendingSession(null)} />
       </Card>}
-      <Field theme={theme} label="Session name" value={draft.session.name} placeholder="e.g. Main" onChangeText={(name) => update({ ...draft, session: { ...draft.session, name } })} />
-      {settings.status === "ready" && settings.revision !== draft.revision && <Copy theme={theme} error>Project groups or sessions changed in another editor. Your draft is kept. Cancel and reopen the editor to use the latest version.</Copy>}
-      <Copy theme={theme} muted>Save session applies group edits to every session using them. New groups also appear in Project groups. Cancel discards these edits.</Copy>
+      <Field theme={theme} label="Window group name" value={draft.session.name} placeholder="e.g. Main" onChangeText={(name) => update({ ...draft, session: { ...draft.session, name } })} />
+      {settings.status === "ready" && settings.revision !== draft.revision && <Copy theme={theme} error>Project groups or window groups changed in another editor. Your draft is kept. Cancel and reopen the editor to use the latest version.</Copy>}
+      <Copy theme={theme} muted>Save window group applies project group edits to every window group using them. New groups also appear in Project groups. Cancel discards these edits.</Copy>
       {projects.isPending && <Copy theme={theme} muted>Loading projects…</Copy>}
       {projects.isError && <View style={{ gap: 8 }}><Copy theme={theme} error>Could not load projects. Check this host’s connection.</Copy><Action theme={theme} label="Retry projects" onPress={() => { void projects.refetch(); }} /></View>}
       {projects.data && draftGroups.map((group, index) => <View key={group.id} style={{ gap: 8 }}>
@@ -151,12 +153,12 @@ export function SessionSettings({ theme, host, layout, launcher, sessionRequest 
       {error && <Copy theme={theme} error>{error}</Copy>}
       <Divider theme={theme} />
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-        <Action theme={theme} variant="filled" label={settings.saving ? "Saving…" : "Save session"} disabled={busy || !projects.data || projects.isError || settings.status !== "ready" || settings.revision !== draft.revision} onPress={() => { void save(); }} />
+        <Action theme={theme} variant="filled" label={settings.saving ? "Saving…" : "Save window group"} disabled={busy || !projects.data || projects.isError || settings.status !== "ready" || settings.revision !== draft.revision} onPress={() => { void save(); }} />
         <Action theme={theme} label="Cancel" disabled={settings.saving} onPress={() => { setDraft(null); setError(null); setPicking(false); setPendingSession(null); }} />
       </View>
     </View>}
     {settings.saveError && <Copy theme={theme} error>{settings.saveError}</Copy>}
     <Divider theme={theme} />
-    <Copy theme={theme} muted>Sessions are shared by clients connected to {host.label}. Opening a session creates new windows each time.</Copy>
+    <Copy theme={theme} muted>Window groups are shared by clients connected to {host.label}. Opening a window group creates new windows each time.</Copy>
   </View>;
 }

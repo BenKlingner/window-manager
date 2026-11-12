@@ -6,9 +6,9 @@ no filesystem or shell access, no network requests, and no credentials or secret
 
 ## What the plugin reads and writes
 
-- **Host settings.** Project groups and sessions are stored through Paseo's plugin settings
+- **Host settings.** Project groups and window groups are stored through Paseo's plugin settings
   API on the selected host and validated with Zod on every read and write. Names are capped at
-  80 characters, groups at 400, sessions at 30, and groups per session at 12. Saves use
+  80 characters, project groups at 400, window groups at 30, and project groups per window group at 12. Saves use
   compare-and-swap revisions so one client cannot overwrite another's edits.
 - **Paseo project and workspace lists.** Read through the public SDK to resolve saved project
   IDs. When a selected project has no workspace, the plugin opens one with the public
@@ -39,7 +39,7 @@ no filesystem or shell access, no network requests, and no credentials or secret
 - Launch tickets and acknowledgements are stored in the app's own origin. Another renderer in
   the same origin could already do anything this plugin does, so they are not a new trust
   boundary. Values are schema-checked and size-capped before use.
-- Group and session names are rendered with React Native text. There is no HTML, no code
+- Project group and window group names are rendered with React Native text. There is no HTML, no code
   evaluation, no URL built from user input, and nothing is sent to external services.
 - Fallback record IDs on non-desktop clients use `Math.random`. They identify UI records only
   and never gate a permission or launch.
@@ -49,9 +49,9 @@ no filesystem or shell access, no network requests, and no credentials or secret
 `npm test` exercises the launcher, journal restore after failure, timeout, cancellation,
 concurrent edits, the write guard, schema rejection, and settings migration. `npm run test:ui`
 renders the actual components in headless Chromium. `npm run typecheck` validates the plugin
-against the pinned `@getpaseo/plugin` 0.13.2 contract. The plugin has no runtime npm
+against the pinned `@getpaseo/plugin` 0.14.0 contract. The plugin has no runtime npm
 dependencies; `npm audit --omit=dev` reports none.
 
 Native window launching has been exercised on Linux with X11 only. macOS, Windows, and
-Wayland still need a live check, and the Paseo version range must be re-verified before it
-is widened past 0.13.x.
+Wayland still need a live check, and each newer Paseo release must be re-verified, then the verified range in
+`client/compat.ts` raised so the in-app notice goes away.

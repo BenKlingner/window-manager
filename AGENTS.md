@@ -4,10 +4,17 @@ Follow the parent workspace guidance and the `paseo-plugin` skill.
 
 ## Desktop compatibility
 
-This plugin currently targets Paseo 0.13.2–0.13.x. It uses the public SDK for
-projects, workspaces, settings, and header contributions. Window creation and
+`requirements.paseo` is `>=0.13.2` with no upper bound, on purpose: a cap made the plugin stop
+loading on every Paseo minor update even when nothing had changed. Instead `client/compat.ts`
+holds the verified range (`VERIFIED_MIN`, `VERIFIED_MAX`) and the launch surfaces show a muted
+notice when the running desktop is newer. The version comes from `navigator.userAgent`, which
+Electron fills with `Paseo/<version>` (`app.setName("Paseo")` in `packages/desktop/src/main.ts`,
+no user agent override as of 0.14.0). After each Paseo release, re-compare the internals below
+and raise `VERIFIED_MAX`; the 0.14.0 internals were compared with 0.13.2 on 2026-10-29 and are
+unchanged. The plugin uses the public SDK for
+projects, workspaces, settings, and the sidebar screen. Window creation and
 sidebar bootstrapping use undocumented desktop behavior isolated in `client/web.ts`
-and `client/launch.ts`. Check Paseo source before widening the version range.
+and `client/launch.ts`. Check Paseo source before raising `VERIFIED_MAX`.
 
 Paseo's `sidebar-view` persistence format is version 8. The plugin's `sidebarSchema` in
 `client/launch.ts` mirrors `SidebarViewPersistedStateSchema` in Paseo's
@@ -51,6 +58,9 @@ points directly to an AppImage and opens a window instead of running the CLI, us
 the running desktop application's bundled `resources/bin/paseo` launcher.
 
 ## Shared project groups
+
+The UI calls sessions **window groups**. Code, settings IDs, and stored data keep the
+`session` name so existing saved data loads unchanged; use "window group" in all user-facing text.
 
 `shared/settings.ts` defines the version 2 `sessions` document: canonical
 `projectGroups` plus sessions referencing `projectGroupIds`. Save both together

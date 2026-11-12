@@ -3,7 +3,7 @@ import { Pressable, Text, View } from "react-native";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePaseo, type PluginSurfaceProps } from "@getpaseo/plugin/client";
 import { windowSchema, type SavedWindow, type Preferences } from "../shared/settings";
-import { desktopUnavailableReason, newId, type Launcher } from "./web";
+import { desktopCompatibilityNotice, desktopUnavailableReason, newId, type Launcher } from "./web";
 import { loadProjects, prepareWindows } from "./projects";
 import { Action, Card, Copy, Divider } from "./ui";
 import { useLibrary } from "./library";
@@ -24,6 +24,7 @@ export function ProjectGroups({ theme, host, layout, launcher, onEditSession }: 
   const [deleting, setDeleting] = useState<string | null>(null);
   const launch = useSyncExternalStore(launcher.subscribe, launcher.getSnapshot);
   const unavailable = desktopUnavailableReason();
+  const untested = desktopCompatibilityNotice();
   const busy = settings.saving || launch.busy;
   useEffect(() => { setDraft(null); setError(null); setDeleting(null); }, [host.id]);
   function edit(window: SavedWindow) {
@@ -50,9 +51,10 @@ export function ProjectGroups({ theme, host, layout, launcher, onEditSession }: 
   return <View style={{ gap: 20, paddingVertical: 8 }}>
     <View style={{ gap: 8 }}>
       <Text style={{ color: theme.colors.foreground, fontSize: layout.compact ? 22 : 26, fontWeight: "700" }}>Project groups</Text>
-      <Copy theme={theme} muted>Each project group opens one window with its selected projects. Add the same group to sessions; edits apply everywhere it is used.</Copy>
+      <Copy theme={theme} muted>Each project group opens one window with its selected projects. Add the same project group to window groups; edits apply everywhere it is used.</Copy>
     </View>
     {unavailable && <Card theme={theme}><Copy theme={theme} muted>{unavailable}</Copy></Card>}
+    {untested && <Card theme={theme}><Copy theme={theme} muted>{untested}</Copy></Card>}
     {launch.message && <Copy theme={theme}>{launch.message}</Copy>}
     {launch.error && <Copy theme={theme} error>{launch.error}</Copy>}
     {settings.status === "loading" && <Copy theme={theme} muted>Loading project groups…</Copy>}
@@ -74,7 +76,7 @@ export function ProjectGroups({ theme, host, layout, launcher, onEditSession }: 
         <Text style={{ color: theme.colors.foreground, fontSize: 18, fontWeight: "600" }}>{window.name}</Text>
         <Copy theme={theme} muted>Projects: {window.projectIds.map((id) => projects.data?.find((p) => p.id === id)?.name ?? (projects.isPending ? "Loading…" : "Unavailable project")).join(" · ")}</Copy>
         <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "baseline", columnGap: 4 }}>
-          <Copy theme={theme} muted>Sessions:</Copy>
+          <Copy theme={theme} muted>Window groups:</Copy>
           {settings.values.sessions.filter((s) => s.projectGroupIds.includes(window.id)).map((s, index, sessions) => <View key={s.id} style={{ flexDirection: "row", alignItems: "baseline", flexShrink: 1 }}>
             <Pressable accessibilityRole="link" accessibilityLabel={s.name} accessibilityState={{ disabled: busy }}
               disabled={busy} onPress={() => onEditSession(s.id)} style={({ pressed }) => ({ flexShrink: 1, opacity: busy ? 0.5 : pressed ? 0.75 : 1 })}>
@@ -82,11 +84,11 @@ export function ProjectGroups({ theme, host, layout, launcher, onEditSession }: 
             </Pressable>
             {index < sessions.length - 1 && <Copy theme={theme} muted>,</Copy>}
           </View>)}
-          {!settings.values.sessions.some((s) => s.projectGroupIds.includes(window.id)) && <Copy theme={theme} muted>Not in any session</Copy>}
+          {!settings.values.sessions.some((s) => s.projectGroupIds.includes(window.id)) && <Copy theme={theme} muted>Not in any window group</Copy>}
         </View>
         <Divider theme={theme} />
         {deleting === window.id ? <View style={{ gap: 10 }}>
-          <Copy theme={theme}>Delete “{window.name}” and remove it from all sessions? Open windows and projects will be kept.</Copy>
+          <Copy theme={theme}>Delete “{window.name}” and remove it from all window groups? Open windows and projects will be kept.</Copy>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
             <Action theme={theme} danger label="Delete project group" disabled={busy} onPress={() => { void settings.save({ ...settings.values, projectGroups: settings.values.projectGroups.filter((w) => w.id !== window.id), sessions: settings.values.sessions.map((s) => ({ ...s, projectGroupIds: s.projectGroupIds.filter((id) => id !== window.id) })) }, settings.revision).then((ok) => { if (ok) setDeleting(null); }); }} />
             <Action theme={theme} label="Keep project group" disabled={busy} onPress={() => setDeleting(null)} />
@@ -99,8 +101,8 @@ export function ProjectGroups({ theme, host, layout, launcher, onEditSession }: 
       </Card>)}
     </>}
     {draft && <View style={{ gap: 16 }}>
-      <Copy theme={theme} muted>Used in: {draft.base.sessions.filter((s) => s.projectGroupIds.includes(draft.window.id)).map((s) => s.name).join(", ") || "No sessions yet"}. Saving updates this group in every session.</Copy>
-      {settings.status === "ready" && settings.revision !== draft.revision && <Copy theme={theme} error>Project groups or sessions changed in another window. Your draft is kept. Cancel and reopen the editor to use the latest version.</Copy>}
+      <Copy theme={theme} muted>Used in: {draft.base.sessions.filter((s) => s.projectGroupIds.includes(draft.window.id)).map((s) => s.name).join(", ") || "No window groups yet"}. Saving updates this project group in every window group.</Copy>
+      {settings.status === "ready" && settings.revision !== draft.revision && <Copy theme={theme} error>Project groups or window groups changed in another window. Your draft is kept. Cancel and reopen the editor to use the latest version.</Copy>}
       {projects.isPending && <Copy theme={theme} muted>Loading projects…</Copy>}
       {projects.isError && <View style={{ gap: 8 }}><Copy theme={theme} error>Could not load projects. Check this host’s connection.</Copy><Action theme={theme} label="Retry projects" onPress={() => { void projects.refetch(); }} /></View>}
       {projects.data && <WindowEditor theme={theme} window={draft.window} index={0} projects={projects.data}

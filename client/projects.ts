@@ -29,7 +29,7 @@ export async function prepareWindows(
   for (const window of windows) {
     if (!window.projectIds.length) throw new Error(`Choose a project for “${window.name}”.`);
     for (const id of window.projectIds) {
-      if (!byId.has(id)) throw new Error(`A project in “${window.name}” is no longer available. Edit this session in setup.`);
+      if (!byId.has(id)) throw new Error(`A project in “${window.name}” is no longer available. Edit it in Window Manager settings.`);
     }
   }
   const targets: WindowLaunch[] = [];
