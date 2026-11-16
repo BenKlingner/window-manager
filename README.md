@@ -5,7 +5,7 @@
 Open your Paseo projects in separate desktop windows. Save the projects for each window as a
 project group, combine groups into named sessions, and open a whole session with one click.
 
-Requires **Paseo Desktop 0.13.2 through 0.13.x**. Created by **Ben Klingner**.
+Requires **Paseo Desktop 0.13.2 or later**, tested up to **0.16**. Created by **Ben Klingner**.
 
 ## Install
 
@@ -67,9 +67,9 @@ platform, so the expected support is:
 If you run the plugin on an untested platform, please [report the result](https://github.com/BenKlingner/window-manager/issues),
 whether it worked or not, with your Paseo version and operating system.
 
-Launching depends on desktop behavior that is not part of Paseo's public plugin API, which is why
-the supported Paseo range is pinned to 0.13.x. Later releases need a compatibility check before the
-range is widened.
+Launching depends on desktop behavior that is not part of Paseo's public plugin API. The plugin is
+only tested up to Paseo 0.16; later releases may change that behavior and break launching. If
+launching stops working after a Paseo update, please [open an issue](https://github.com/BenKlingner/window-manager/issues).
 
 ## Known limitations
 

@@ -49,9 +49,9 @@ no filesystem or shell access, no network requests, and no credentials or secret
 `npm test` exercises the launcher, journal restore after failure, timeout, cancellation,
 concurrent edits, the write guard, schema rejection, and settings migration. `npm run test:ui`
 renders the actual components in headless Chromium. `npm run typecheck` validates the plugin
-against the pinned `@getpaseo/plugin` 0.13.2 contract. The plugin has no runtime npm
+against the pinned `@getpaseo/plugin` 0.16.0 contract. The plugin has no runtime npm
 dependencies; `npm audit --omit=dev` reports none.
 
 Native window launching has been exercised on Linux with X11 only. macOS, Windows, and
-Wayland still need a live check, and the Paseo version range must be re-verified before it
-is widened past 0.13.x.
+Wayland still need a live check. The desktop internals the launcher relies on are verified
+through Paseo 0.16 and must be re-checked for each later release.

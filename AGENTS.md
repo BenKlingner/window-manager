@@ -4,10 +4,10 @@ Follow the parent workspace guidance and the `paseo-plugin` skill.
 
 ## Desktop compatibility
 
-This plugin currently targets Paseo 0.13.2–0.13.x. It uses the public SDK for
+This plugin supports Paseo 0.13.2 and later and is tested up to 0.16. It uses the public SDK for
 projects, workspaces, settings, and header contributions. Window creation and
 sidebar bootstrapping use undocumented desktop behavior isolated in `client/web.ts`
-and `client/launch.ts`. Check Paseo source before widening the version range.
+and `client/launch.ts`. Check Paseo source against each new Paseo release and update the tested version in the docs.
 
 Paseo's `sidebar-view` persistence format is version 8. The plugin's `sidebarSchema` in
 `client/launch.ts` mirrors `SidebarViewPersistedStateSchema` in Paseo's

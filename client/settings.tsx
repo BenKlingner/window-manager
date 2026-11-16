@@ -41,7 +41,7 @@ export function WindowSettings(props: PluginSurfaceProps & { launcher: Launcher 
       </Card>
       <Card theme={theme}>
         <Text style={{ color: theme.colors.foreground, fontSize: 17, fontWeight: "600" }}>Opening windows</Text>
-        <Copy theme={theme}>Launching requires Paseo Desktop 0.13.2–0.13.x. You can edit saved windows and sessions on other clients. Each launch creates new windows.</Copy>
+        <Copy theme={theme}>Launching requires Paseo Desktop 0.13.2 or later (tested up to 0.16). You can edit saved windows and sessions on other clients. Each launch creates new windows.</Copy>
         <Copy theme={theme}>Refreshing a window may reset its project selection. Reopen your saved window or session to restore it. Names label your saved setup; window positions, sizes, and native titles are not saved.</Copy>
         <Copy theme={theme} muted>Desktop launching uses Paseo functionality outside its public plugin API. Linux/X11 has been tested; macOS and Windows still need native testing.</Copy>
       </Card>

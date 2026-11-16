@@ -1,7 +1,7 @@
 import type { PaseoApi, PaseoProject } from "@getpaseo/client";
 import type { ProjectChoice, SavedWindow, WindowLaunch } from "../shared/settings";
 
-// Paseo 0.13.x: unique equivalence keys win; duplicate keys on one host use placement IDs.
+// Paseo 0.13.2–0.16: unique equivalence keys win; duplicate keys on one host use placement IDs.
 export function projectChoices(projects: readonly PaseoProject[], hostId: string): ProjectChoice[] {
   const counts = new Map<string, number>();
   for (const p of projects) if (p.projectKey) counts.set(p.projectKey, (counts.get(p.projectKey) ?? 0) + 1);
