@@ -3,7 +3,7 @@
   "name": "Window Manager",
   "description": "Save project groups as windows and combine shared groups into sessions.",
   "icon": "assets/icon.png",
-  "media": ["assets/project-groups.png", "assets/sessions.png"],
+  "media": ["assets/window-groups.png", "assets/project-groups.png"],
   "requirements": {
     "paseo": ">=0.13.2"
   }

@@ -81,8 +81,8 @@ try {
   // Fail closed if a future fixture change tries to reach a host or external service.
   await page.route('**/*',route=>new URL(route.request().url()).origin===('http://127.0.0.1:'+port)?route.continue():route.abort());
   await page.goto('http://127.0.0.1:'+port+'/?'+(dark?'dark':'light')+(compact?'&compact':''));
-  await page.getByText('Projects: Website · API',{exact:true}).waitFor();
-  for(const [tab,file] of [['Project groups','project-groups'],['Sessions manager','sessions']]) {
+  await page.getByText('Daily workspace',{exact:true}).filter({visible:true}).first().waitFor();
+  for(const [tab,file] of [['Window groups','window-groups'],['Project groups','project-groups']]) {
    await page.getByRole('tab',{name:tab,exact:true}).click();
    await page.getByText('Daily workspace',{exact:true}).filter({visible:true}).first().waitFor();
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Horizontal overflow');

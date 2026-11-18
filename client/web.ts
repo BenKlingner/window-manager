@@ -6,6 +6,7 @@ import {
 } from "./launch";
 import type { WindowLaunch } from "../shared/settings";
 import { createLaunchWriteGuard } from "./storage-guard";
+import { compatibilityNotice, parsePaseoVersion } from "./compat";
 
 // All undocumented desktop access is isolated here. No DOM imports or globals in UI components.
 interface DesktopEnvironment {
@@ -13,7 +14,7 @@ interface DesktopEnvironment {
   localStorage?: StoragePort;
   sessionStorage?: StoragePort;
   crypto?: { randomUUID(): string };
-  navigator?: { locks?: { request<T>(name: string, options: { ifAvailable: true }, callback: (lock: unknown | null) => Promise<T>): Promise<T> } };
+  navigator?: { userAgent?: string; locks?: { request<T>(name: string, options: { ifAvailable: true }, callback: (lock: unknown | null) => Promise<T>): Promise<T> } };
   location?: { pathname: string };
 }
 
@@ -62,10 +63,19 @@ function storageGuard(): GuardRegistration {
   return registration;
 }
 
+/** The running Paseo Desktop version, or null outside the desktop app. */
+export function desktopVersion(): string | null {
+  try { return parsePaseoVersion(environment().navigator?.userAgent); } catch { return null; }
+}
+
+export function desktopCompatibilityNotice(): string | null {
+  return desktopUnavailableReason() ? null : compatibilityNotice(desktopVersion());
+}
+
 export function desktopUnavailableReason(): string | null {
   try {
     const env = environment();
-    if (typeof env.paseoDesktop?.window?.openNew !== "function") return "Open Paseo Desktop to launch windows. You can still manage saved sessions here.";
+    if (typeof env.paseoDesktop?.window?.openNew !== "function") return "Open Paseo Desktop to launch windows. You can still manage saved groups here.";
     if (!env.localStorage || !env.sessionStorage || !env.crypto?.randomUUID || !env.navigator?.locks) return "Window launching is unavailable in this desktop version.";
     return null;
   } catch { return "Paseo’s local window settings are unavailable."; }
@@ -107,7 +117,7 @@ function waitForReady(storage: StoragePort, ticket: LaunchTicket, signal: AbortS
       try {
         if (signal.aborted) return abort();
         if (isAcknowledged(storage, ticket)) return finish();
-        if (Date.now() > ticket.expiresAt) finish(new Error("The new window did not finish loading. Check its connection before opening the session again."));
+        if (Date.now() > ticket.expiresAt) finish(new Error("The new window did not finish loading. Check its connection before opening it again."));
       } catch { finish(new Error("Could not check whether the new window finished loading.")); }
     };
     const timer = setInterval(tick, 100);
@@ -127,7 +137,7 @@ export function desktopPort(): LaunchPort {
     openWindow: () => env.paseoDesktop!.window!.openNew!(),
     waitForReady: (ticket, signal) => waitForReady(storage, ticket, signal),
     exclusive: (operation) => env.navigator!.locks!.request(LOCK_KEY, { ifAvailable: true }, async (lock) => {
-      if (!lock) throw new Error("Another Paseo window is opening a session. Wait for it to finish, then try again.");
+      if (!lock) throw new Error("Another Paseo window is opening windows. Wait for it to finish, then try again.");
       return operation();
     }),
   };

@@ -14,20 +14,20 @@ export const legacySessionSchema = z.object({
 });
 export const sessionSchema = z.object({
   id, name,
-  projectGroupIds: z.array(id).max(12, "Use at most 12 project groups per session.")
+  projectGroupIds: z.array(id).max(12, "Use at most 12 project groups per window group.")
     .refine((ids) => new Set(ids).size === ids.length, "A project group is included more than once."),
 });
 export const preferencesSchema = z.object({
   projectGroups: z.array(windowSchema).max(400)
     .refine((items) => new Set(items.map((item) => item.id)).size === items.length, "Project group IDs must be unique.").default([]),
   sessions: z.array(sessionSchema).max(30)
-    .refine((items) => new Set(items.map((item) => item.id)).size === items.length, "Session IDs must be unique.").default([]),
+    .refine((items) => new Set(items.map((item) => item.id)).size === items.length, "Window group IDs must be unique.").default([]),
   legacyWindowsImported: z.boolean().default(false),
 }).superRefine((values, ctx) => {
   const groups = new Set(values.projectGroups.map((group) => group.id));
   for (const session of values.sessions) {
     if (session.projectGroupIds.some((id) => !groups.has(id))) {
-      ctx.addIssue({ code: "custom", message: "A session references a missing project group." });
+      ctx.addIssue({ code: "custom", message: "A window group references a missing project group." });
     }
   }
 });

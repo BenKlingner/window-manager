@@ -113,7 +113,7 @@ export async function launchWindows(
   signal: AbortSignal,
   progress: (message: string) => void = () => {},
 ): Promise<void> {
-  if (!targets.length || targets.length > 12) throw new Error("A session must contain 1–12 windows.");
+  if (!targets.length || targets.length > 12) throw new Error("A window group must contain 1–12 windows.");
   await port.exclusive(async () => {
     const abandoned = readTicket(port.storage);
     if (abandoned) {
