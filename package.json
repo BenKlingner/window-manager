@@ -24,9 +24,9 @@
     "screenshots": "node --import tsx client/__tests__/screenshots.mts"
   },
   "devDependencies": {
-    "@getpaseo/client": "0.16.0",
-    "@getpaseo/plugin": "0.16.0",
-    "@getpaseo/protocol": "0.16.0",
+    "@getpaseo/client": "0.16.1",
+    "@getpaseo/plugin": "0.16.1",
+    "@getpaseo/protocol": "0.16.1",
     "@tanstack/react-query": "^5.90.11",
     "@types/react": "~19.2.0",
     "esbuild": "^0.28.1",
@@ -40,7 +40,7 @@
     "zod": "^4.4.3"
   },
   "type": "module",
-  "description": "Save project groups as windows and combine shared groups into sessions.",
+  "description": "Save project groups as windows and combine them into window groups.",
   "author": "Ben Klingner",
   "license": "MIT",
   "homepage": "https://github.com/BenKlingner/window-manager",

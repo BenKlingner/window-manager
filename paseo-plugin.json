@@ -1,7 +1,7 @@
 {
   "id": "window-manager",
   "name": "Window Manager",
-  "description": "Save project groups as windows and combine shared groups into sessions.",
+  "description": "Save project groups as windows and combine them into window groups.",
   "icon": "assets/icon.png",
   "media": ["assets/window-groups.png", "assets/project-groups.png"],
   "requirements": {
